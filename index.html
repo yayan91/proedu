@@ -238,7 +238,7 @@
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
           <button class="btn btn-accent" onclick="triggerPrint('siswa', 'all')"><i class="fa-solid fa-print"></i> Cetak Rapor Lengkap</button>
           <select id="select-tes-siswa" class="input-control" style="width: 180px;">
-            <option value="T01">T01: RIASEC</option><option value="T02">T02: Bakat</option>
+            <option value="T01">T01: RIASEC</option><option value="T02">T02: Kecerdasan Majemuk</option>
             <option value="T03">T03: Gaya Belajar</option><option value="T04">T04: Kepribadian</option>
             <option value="T05">T05: Kebiasaan Belajar</option>
           </select>
@@ -291,24 +291,81 @@
   </main>
 
   <main id="page-guru" class="view-page">
-    <div class="card-panel" style="padding: 30px; margin-bottom: 25px; text-align: center; border-top: 5px solid var(--primary);">
-      <h2>Panel Guru BK</h2>
+    <div class="card-panel" style="padding: 25px; margin-bottom: 25px; text-align: center; border-top: 5px solid var(--primary); position: relative;">
+      <h2 style="color: var(--primary);"><i class="fa-solid fa-user-tie"></i> Pusat Analitik Guru BK</h2>
+      <button class="btn btn-success" style="position: absolute; top: 20px; right: 20px; padding: 6px 15px; font-size: 0.85rem;" onclick="syncDataGuru()">
+        <i class="fa-solid fa-arrows-rotate"></i> Sinkron Data
+      </button>
     </div>
-    <div class="card-panel" style="padding: 30px; text-align: center;">
+
+    <div class="nav-buttons">
+      <button class="btn btn-outline active" onclick="showSubMenuGuru('guru-dash', this)"><i class="fa-solid fa-chart-line"></i> Dashboard Pro</button>
+      <button class="btn btn-outline" onclick="showSubMenuGuru('guru-data', this)"><i class="fa-solid fa-users-rectangle"></i> Data Siswa</button>
+      <button class="btn btn-outline" onclick="showSubMenuGuru('guru-cetak', this)"><i class="fa-solid fa-print"></i> Mode Cetak</button>
+      <button class="btn btn-outline" onclick="showSubMenuGuru('guru-info', this)"><i class="fa-solid fa-circle-info"></i> Info Instrumen</button>
+    </div>
+
+    <div id="guru-dash" class="sub-menu-guru card-panel" style="padding: 30px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+        <label style="font-weight: 600; color: var(--primary);"><i class="fa-solid fa-filter"></i> Filter Analitik:</label>
+        <select id="dash-select-kelas" class="input-control" style="width: 180px;" onchange="updateDashDropdownSiswa()"></select>
+        <select id="dash-select-siswa" class="input-control" style="width: 250px;" onchange="renderDashChartGuru()"></select>
+      </div>
+      <div id="guru-chart-wrapper" style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; width: 100%;">
+        <p style="color:#666; font-style:italic;">Silakan pilih filter untuk menampilkan metrik asesmen.</p>
+      </div>
+    </div>
+
+    <div id="guru-data" class="sub-menu-guru card-panel" style="padding: 30px; display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+        <h3 style="color: var(--primary);"><i class="fa-solid fa-table-list"></i> Database Hasil Asesmen</h3>
+        <select id="tabel-select-kelas" class="input-control" style="width: 200px;" onchange="filterDataTabel()"></select>
+      </div>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="background: var(--primary); color: white;">
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">No</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Nama Siswa</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">NISN</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">L/P</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: center;">Aksi Lanjutan</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-siswa"></tbody>
+        </table>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+        <button class="btn btn-outline" style="padding: 5px 15px;" onclick="ubahHalaman(-1)" id="btn-prev-page"><i class="fa-solid fa-chevron-left"></i></button>
+        <span id="page-info" style="font-weight: bold; color: var(--primary); font-size: 0.9rem;">Halaman 1</span>
+        <button class="btn btn-outline" style="padding: 5px 15px;" onclick="ubahHalaman(1)" id="btn-next-page"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div id="guru-cetak" class="sub-menu-guru card-panel" style="padding: 30px; text-align: center; display: none;">
       <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-print"></i> Cetak Massal Per Kelas</h3>
       <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
         <select id="guru-select-kelas" class="input-control" style="width: 200px;"></select>
         <select id="guru-select-tes" class="input-control" style="width: 200px;">
-          <option value="all">Rapor Lengkap</option><option value="T01">T01: RIASEC</option><option value="T02">T02: Bakat</option>
+          <option value="all">Rapor Lengkap</option>
+          <option value="T01">T01: RIASEC</option><option value="T02">T02: Kecerdasan Majemuk</option>
           <option value="T03">T03: Gaya Belajar</option><option value="T04">T04: Kepribadian</option><option value="T05">T05: Kebiasaan</option>
         </select>
         <button class="btn btn-primary" onclick="triggerPrint('guru', 'massal')">Cetak Kelas</button>
       </div>
-      <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+      <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #ccc;">
       <h3 style="margin-bottom: 15px; color: var(--primary);"><i class="fa-solid fa-user"></i> Cetak Per Siswa Spesifik</h3>
       <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-        <input type="text" id="guru-input-nisn" class="input-control" placeholder="NISN Siswa" style="width: 200px;">
-        <button class="btn btn-accent" onclick="triggerPrint('guru', 'individu')">Cari & Cetak</button>
+        <input type="text" id="guru-input-nisn" class="input-control" placeholder="Ketik Nama atau NISN..." list="list-siswa" style="width: 280px;" onfocus="siapkanDataSiswa()">
+        <datalist id="list-siswa"></datalist>
+        <button class="btn btn-accent" onclick="prosesCetakIndividu()"><i class="fa-solid fa-magnifying-glass"></i> Cari & Cetak</button>
+      </div>
+    </div>
+
+    <div id="guru-info" class="sub-menu-guru card-panel" style="padding: 30px; display: none;">
+      <h3 style="color: var(--primary); margin-bottom: 20px; text-align: center;"><i class="fa-solid fa-book-open"></i> Landasan Teori Instrumen Asesmen</h3>
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px;">
+        <ul id="list-teori-guru" style="list-style: none; display: flex; flex-direction: column; gap: 16px; margin:0; padding:0;"></ul>
       </div>
     </div>
   </main>
@@ -323,7 +380,7 @@
     // ---------------------------------------------------------
     // 1. MASUKKAN URL API BACKEND GOOGLE SCRIPT ANDA DI SINI
     // ---------------------------------------------------------
-    const API_URL = "https://script.google.com/macros/s/AKfycbxUh2n_qdHvHrKyn9oZn_xCRI4vIHyKeH9NzRSD-nKnoXuEa7WJ6fJoDJ29CL95NW5T/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyluvlr01gNF-NUh-pegVx7LhIrtMl2SNr_2Y8Vaf17wQvCJgASSqdlLPpQNwjWsORq/exec"; 
 
     let sessionData = { role: null, nama: null, nisn_nip: null, kelas: null, jk: null, ta: null, sem: null, profilSekolah: null, listKelas: new Set() };
     let cacheBankSoal = [], cacheHasil = [], cacheMentah = [], cacheInterpretasi = [];
@@ -818,10 +875,10 @@
       proAlert.fire({ title: 'Menyusun Dokumen...', text: 'Mengekstrak deskripsi dan saran dari database.', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
       
       try {
-        // Tarik data mentah terbaru untuk melacak Tanggal dan Durasi per Tes
-        if(cacheHasil.length === 0 || cacheInterpretasi.length === 0 || cacheMentah.length === 0) {
-          const [h, i, m] = await Promise.all([fetchData('Rekap_Hasil_Akhir'), fetchData('Norma_Interpretasi'), fetchData('Jawaban_Mentah')]);
-          cacheHasil = h; cacheInterpretasi = i; cacheMentah = m;
+        // Cari baris ini di dalam triggerPrint dan ganti:
+        if(cacheHasil.length === 0 || cacheInterpretasi.length === 0 || cacheMentah.length === 0 || typeof cacheMasterTes === 'undefined') {
+          const [h, i, m, mt] = await Promise.all([fetchData('Rekap_Hasil_Akhir'), fetchData('Norma_Interpretasi'), fetchData('Jawaban_Mentah'), fetchData('Master_Tes')]);
+          cacheHasil = h; cacheInterpretasi = i; cacheMentah = m; window.cacheMasterTes = mt;
         }
 
         let targetDataArray = [];
@@ -933,7 +990,7 @@
 
           // Mendapatkan Nama Tes dari database Master_Tes
           const getNamaTes = (id) => {
-            const tes = cacheHasil.length > 0 ? { "T01":"Tes Minat Karir", "T02":"Tes Bakat Dominan", "T03":"Tes Gaya Belajar", "T04":"Tes Kepribadian", "T05":"Tes Kebiasaan Belajar" } : {};
+            const tes = cacheHasil.length > 0 ? { "T01":"Tes Minat Karir", "T02":"Tes Kecerdasan Majemuk", "T03":"Tes Gaya Belajar", "T04":"Tes Kepribadian", "T05":"Tes Kebiasaan Belajar" } : {};
             return tes[id] || id;
           };
 
@@ -959,7 +1016,7 @@
          // Menentukan judul rapor secara dinamis tanpa kode Txx
           const namaTesMap = { 
             "T01": "Tes Minat Karir", 
-            "T02": "Tes Bakat Dominan", 
+            "T02": "Tes Kecerdasan Majemuk", 
             "T03": "Tes Gaya Belajar", 
             "T04": "Tes Kepribadian", 
             "T05": "Tes Kebiasaan Belajar" 
@@ -968,6 +1025,61 @@
           const judulRapor = printType === 'all' 
             ? "DOKUMEN HASIL ASESMEN LENGKAP" 
             : `HASIL ASESMEN ${namaTesMap[printType] || printType}`.toUpperCase();
+		  
+		  // --- POTONGAN TAMBAHAN: LAMPIRAN TEORI OTOMATIS ---
+          let infoTambahanHTML = '';
+          
+          if (typeof cacheMasterTes !== 'undefined') {
+            if (printType !== 'all') {
+              // Jika Cetak 1 Tes: Tampilkan dalam kotak
+              const cariTes = cacheMasterTes.find(t => t[0] === printType);
+              let deskripsiDB = cariTes && cariTes[2] ? cariTes[2] : "Deskripsi tidak ditemukan.";
+              
+              infoTambahanHTML = `
+                <div style="border: 1px solid black; padding: 10px 15px; margin-bottom: 10px; border-radius: 5px; page-break-inside: avoid; background-color: #f8fafc;">
+                  <div style="font-size: 13px; font-weight: bold; color: #1E3A8A; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 8px;">
+                    Informasi ${namaTesMap[printType] || printType}
+                  </div>
+                  <div style="font-size: 11px; text-align: justify; line-height: 1.5; color: #333;">
+                    ${deskripsiDB}
+                  </div>
+                </div>
+              `;
+            } else {
+              // Jika Cetak Semua Tes: Opsi 2 (Lampiran Daftar Teori di Bawah)
+              let daftarTeori = '';
+              
+              // PERBAIKAN: Hanya ambil tes yang ada di dalam hasil cetakan (kontenTesHTML) siswa ini
+              const tesYangDikerjakan = cacheMasterTes.filter(t => {
+                const isTesUtama = ["T01", "T02", "T03", "T04", "T05"].includes(t[0]);
+                // Cek apakah nama tes muncul di dalam HTML hasil tes siswa di atasnya
+                const isAdaDiHasil = kontenTesHTML.includes(namaTesMap[t[0]]) || kontenTesHTML.includes(t[1]);
+                
+                return isTesUtama && isAdaDiHasil;
+              });
+              
+              // Hanya tampilkan kotak lampiran JIKA ada minimal 1 tes yang dikerjakan
+              if (tesYangDikerjakan.length > 0) {
+                tesYangDikerjakan.forEach(tes => {
+                  daftarTeori += `
+                    <li style="margin-bottom: 6px;">
+                      <b>${tes[1]}:</b> ${tes[2]}
+                    </li>
+                  `;
+                });
+
+                infoTambahanHTML = `
+                  <div style="border-top: 2px solid black; margin-top: 15px; padding-top: 15px; page-break-inside: avoid;">
+                    <h4 style="color: #1E3A8A; font-size: 13px; margin-bottom: 10px; text-transform: uppercase;">Lampiran: Keterangan & Landasan Teori Instrumen</h4>
+                    <ul style="font-size: 11px; text-align: justify; padding-left: 20px; line-height: 1.5; color: #333; margin: 0;">
+                      ${daftarTeori}
+                    </ul>
+                  </div>
+                `;
+              }
+            }
+          }
+          // --- AKHIR POTONGAN TAMBAHAN ---
 
           printContainer.insertAdjacentHTML('beforeend', `
             <div class="print-page" style="font-family: 'Times New Roman', Times, serif; color: black; line-height: 1.4;">
@@ -990,7 +1102,8 @@
 
               <h3 style="text-align:center; background:#1E3A8A; color:white; padding:6px; margin-bottom:15px; font-size:14px; text-transform:uppercase; -webkit-print-color-adjust: exact; print-color-adjust: exact;">${judulRapor}</h3>
               
-              ${kontenTesHTML} 
+              ${kontenTesHTML}
+			  ${infoTambahanHTML}
               ${ttdHTML}
             </div>
           `);
@@ -1015,6 +1128,309 @@
 		confirmButtonText: 'Tutup'
 	  });
 	}
+	
+	// ==========================================
+	// TAMBAHAN: FITUR PENCARIAN NAMA SISWA
+	// ==========================================
+
+	function siapkanDataSiswa() {
+	  const datalist = document.getElementById('list-siswa');
+	  
+	  // Jika daftar sudah terisi, abaikan agar tidak loading berulang
+	  if (datalist.options.length > 0) return; 
+	  
+	  // Mengambil data dari cacheHasil
+	  // (Asumsi standar: index 0 = NISN, index 1 = Nama, index 2 = Kelas)
+	  if (typeof cacheHasil !== 'undefined' && cacheHasil.length > 0) {
+		const siswaUnik = new Set();
+		
+		cacheHasil.forEach(row => {
+		  const nisn = row[0]; 
+		  const nama = row[1];
+		  const kelas = row[2] || '-'; // Jika kelas kosong, beri tanda strip
+		  
+		  // Jika NISN ada dan belum masuk ke dalam list
+		  if (nisn && nama && !siswaUnik.has(nisn)) {
+			siswaUnik.add(nisn);
+			const option = document.createElement('option');
+			// Format yang akan muncul: "123456789 - Budi Santoso - IX A"
+			option.value = `${nisn} - ${nama} - ${kelas}`;
+			datalist.appendChild(option);
+		  }
+		});
+	  }
+	}
+
+	function prosesCetakIndividu() {
+	  const inputEl = document.getElementById('guru-input-nisn');
+	  const nilaiAsli = inputEl.value; // Contoh: "123456789 - Budi Santoso - IX A"
+	  
+	  if (!nilaiAsli) {
+		alert("Silakan ketik atau pilih nama siswa terlebih dahulu!");
+		return;
+	  }
+	  
+	  // Trik Cerdas: Ambil NISN-nya saja (karakter sebelum spasi pertama)
+	  const nisnSaja = nilaiAsli.split(' ')[0]; 
+	  
+	  // Ubah isi input sementara jadi NISN agar sistem cetak tidak error
+	  inputEl.value = nisnSaja;
+	  
+	  // Panggil fungsi cetak asli buatan Bapak
+	  triggerPrint('guru', 'individu');
+	  
+	  // Kembalikan nama lengkap ke kotak input dengan jeda waktu sedikit
+	  setTimeout(() => {
+		inputEl.value = nilaiAsli;
+	  }, 1000);
+	}
+	
+	// ==========================================
+    // SISTEM MASTER ANALITIK GURU BK (DASHBOARD PRO & PAGINATION)
+    // ==========================================
+
+    let tabelCurrentPage = 1;
+    const tabelRowsPerPage = 10;
+    let tabelFilteredData = [];
+    let guruChartsList = []; // Menyimpan instance chart agar bisa dihancurkan/update
+
+    function showSubMenuGuru(menuId, btnElement) {
+      document.querySelectorAll('.sub-menu-guru').forEach(el => el.style.display = 'none');
+      document.getElementById(menuId).style.display = 'block';
+      
+      if(btnElement) {
+        document.querySelectorAll('#page-guru .nav-buttons .btn').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+      
+      if(menuId === 'guru-dash') { populateKelasDropdowns(); updateDashDropdownSiswa(); }
+      if(menuId === 'guru-data') { populateKelasDropdowns(); filterDataTabel(); }
+      if(menuId === 'guru-info') renderInfoGuru();
+    }
+
+    // --- FITUR 1: SINKRONISASI DATA ---
+    async function syncDataGuru() {
+      proAlert.fire({ title: 'Menyinkronkan...', text:'Menarik data real-time dari server.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      try {
+        const [h, m, mt] = await Promise.all([fetchData('Rekap_Hasil_Akhir'), fetchData('Jawaban_Mentah'), fetchData('Master_Tes')]);
+        cacheHasil = h; cacheMentah = m; window.cacheMasterTes = mt;
+        if(document.getElementById('guru-dash').style.display === 'block') updateDashDropdownSiswa();
+        if(document.getElementById('guru-data').style.display === 'block') filterDataTabel();
+        proAlert.fire({ title: 'Sinkronisasi Sukses!', icon: 'success', timer: 1500, showConfirmButton: false });
+      } catch(e) { proAlert.fire('Gagal', 'Koneksi ke server terputus.', 'error'); }
+    }
+
+    function populateKelasDropdowns() {
+      const selectDash = document.getElementById("dash-select-kelas");
+      const selectTabel = document.getElementById("tabel-select-kelas");
+      if (selectDash.options.length === 0) {
+        Array.from(sessionData.listKelas).sort().forEach(k => {
+          selectDash.insertAdjacentHTML('beforeend', `<option value="${k}">Kelas ${k}</option>`);
+          selectTabel.insertAdjacentHTML('beforeend', `<option value="${k}">Kelas ${k}</option>`);
+        });
+      }
+    }
+
+    // --- FITUR 2: PAGINATION TABEL SISWA ---
+    function filterDataTabel() {
+      const kls = document.getElementById("tabel-select-kelas").value;
+      tabelFilteredData = cacheHasil.filter(r => r[3] == kls);
+      tabelCurrentPage = 1;
+      renderTabelSiswa();
+    }
+
+    function ubahHalaman(step) {
+      tabelCurrentPage += step;
+      renderTabelSiswa();
+    }
+
+    function renderTabelSiswa() {
+      const tbody = document.getElementById("tbody-siswa");
+      tbody.innerHTML = "";
+      
+      const totalPages = Math.ceil(tabelFilteredData.length / tabelRowsPerPage) || 1;
+      const start = (tabelCurrentPage - 1) * tabelRowsPerPage;
+      const end = start + tabelRowsPerPage;
+      const paginatedData = tabelFilteredData.slice(start, end);
+
+      paginatedData.forEach((row, index) => {
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr style="border-bottom: 1px solid #e2e8f0; transition: 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 12px;">${start + index + 1}</td>
+            <td style="padding: 12px; font-weight: 600; color: var(--primary);">${row[1]}</td>
+            <td style="padding: 12px;">${row[0]}</td>
+            <td style="padding: 12px;">${row[2]}</td>
+            <td style="padding: 12px; text-align: center; display: flex; gap: 5px; justify-content: center;">
+              <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;" onclick="lihatCetakTabel('${row[0]}')"><i class="fa-solid fa-print"></i> Cetak</button>
+              <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="hapusDataSiswa('${row[0]}', '${row[1]}')"><i class="fa-solid fa-trash"></i> Hapus</button>
+            </td>
+          </tr>
+        `);
+      });
+
+      document.getElementById("page-info").innerText = `Halaman ${tabelCurrentPage} dari ${totalPages}`;
+      document.getElementById("btn-prev-page").disabled = tabelCurrentPage === 1;
+      document.getElementById("btn-next-page").disabled = tabelCurrentPage >= totalPages;
+    }
+
+    function lihatCetakTabel(nisn) {
+      document.getElementById('guru-input-nisn').value = nisn;
+      showSubMenuGuru('guru-cetak', document.querySelectorAll('#page-guru .nav-buttons .btn')[2]);
+    }
+
+    // --- FITUR 3: DASHBOARD PRO (CHART KELAS & INDIVIDU) ---
+    function updateDashDropdownSiswa() {
+      const kls = document.getElementById("dash-select-kelas").value;
+      const selectSiswa = document.getElementById("dash-select-siswa");
+      selectSiswa.innerHTML = `<option value="ALL">🌟 Tampilkan Rata-Rata Kelas</option>`;
+      
+      cacheHasil.filter(r => r[3] == kls).forEach(row => {
+        selectSiswa.insertAdjacentHTML('beforeend', `<option value="${row[0]}">${row[0]} - ${row[1]}</option>`);
+      });
+      renderDashChartGuru();
+    }
+
+    function renderDashChartGuru() {
+      const container = document.getElementById("guru-chart-wrapper");
+      const kls = document.getElementById("dash-select-kelas").value;
+      const nisn = document.getElementById("dash-select-siswa").value;
+      
+      // Hancurkan chart lama agar tidak tumpang tindih
+      guruChartsList.forEach(c => c.destroy());
+      guruChartsList = [];
+      container.innerHTML = "";
+
+      let sourceData = [];
+      let isAveraging = false;
+
+      if (nisn === "ALL") {
+        const dataKelas = cacheHasil.filter(r => r[3] == kls);
+        if(dataKelas.length === 0) { container.innerHTML = "<p>Data kelas kosong.</p>"; return; }
+        
+        // Logika Hitung Rata-rata Cerdas
+        sourceData = new Array(41).fill(0);
+        let countTes = new Array(41).fill(0);
+        
+        dataKelas.forEach(row => {
+          for(let i=7; i<=39; i++) {
+            if(row[i] !== "" && !isNaN(row[i])) { sourceData[i] += parseFloat(row[i]); countTes[i]++; }
+          }
+        });
+        
+        for(let i=7; i<=39; i++) {
+          sourceData[i] = countTes[i] > 0 ? (sourceData[i] / countTes[i]).toFixed(1) : "";
+        }
+        isAveraging = true;
+      } else {
+        sourceData = cacheHasil.find(r => r[0] == nisn);
+        if(!sourceData) return;
+      }
+
+      // Konfigurasi Chart Dinamis
+      const chartsConfig = [];
+      if (sourceData[7] !== "") chartsConfig.push({ id: 'gChartT01', title: 'T01: RIASEC', type: 'radar', labels: ['Realistic', 'Investigative', 'Artistic', 'Social', 'Enterprising', 'Conventional'], data: [sourceData[7], sourceData[8], sourceData[9], sourceData[10], sourceData[11], sourceData[12]] });
+      if (sourceData[14] !== "") chartsConfig.push({ id: 'gChartT02', title: 'T02: Kecerdasan Majemuk', type: 'radar', labels: ['Ling', 'Log', 'Spas', 'Kin', 'Mus', 'Inter', 'Intra', 'Nat', 'Eks'], data: [sourceData[14], sourceData[15], sourceData[16], sourceData[17], sourceData[18], sourceData[19], sourceData[20], sourceData[21], sourceData[22]] });
+      if (sourceData[24] !== "") chartsConfig.push({ id: 'gChartT03', title: 'T03: Gaya Belajar', type: 'bar', labels: ['Visual', 'Auditori', 'Kinestetik'], data: [sourceData[24], sourceData[25], sourceData[26]] });
+      if (sourceData[28] !== "") chartsConfig.push({ id: 'gChartT04', title: 'T04: Kepribadian', type: 'radar', labels: ['Open', 'Conscientious', 'Extra', 'Agree', 'Neuro'], data: [sourceData[28], sourceData[29], sourceData[30], sourceData[31], sourceData[32]] });
+      if (sourceData[34] !== "") chartsConfig.push({ id: 'gChartT05', title: 'T05: Kebiasaan', type: 'bar', labels: ['Waktu', 'Motivasi', 'Fokus', 'Digital', 'Cemas'], data: [sourceData[34], sourceData[35], sourceData[36], sourceData[37], sourceData[38]] });
+
+      if (chartsConfig.length === 0) { container.innerHTML = "<p>Siswa ini belum menyelesaikan tes apapun.</p>"; return; }
+
+      chartsConfig.forEach(config => {
+        const wrapper = document.createElement("div");
+        wrapper.style.width = "100%"; wrapper.style.maxWidth = "350px"; wrapper.style.background = "#ffffff"; wrapper.style.padding = "20px"; wrapper.style.borderRadius = "15px"; wrapper.style.border = "1px solid #e2e8f0"; wrapper.style.boxShadow = "0 8px 20px rgba(0,0,0,0.06)";
+        
+        // Judul Box Dinamis (Menyesuaikan Individu atau Kelas)
+        let subTitle = isAveraging ? `<span style="font-size:0.8rem; color:#ef4444; background:#fee2e2; padding:2px 8px; border-radius:10px;">📊 Rata-rata Kelas</span>` : `<span style="font-size:0.8rem; color:#10b981; background:#d1fae5; padding:2px 8px; border-radius:10px;">👤 Profil Individu</span>`;
+        
+        wrapper.innerHTML = `<div style="text-align:center; font-weight:bold; color:var(--primary); margin-bottom:10px;">${config.title}<br>${subTitle}</div><canvas id="${config.id}"></canvas>`;
+        container.appendChild(wrapper);
+
+        const ctx = document.getElementById(config.id).getContext('2d');
+        const bgColor = isAveraging ? 'rgba(16, 185, 129, 0.2)' : 'rgba(30, 58, 138, 0.15)';
+        const borderColor = isAveraging ? '#10b981' : '#1E3A8A';
+
+        const newChart = new Chart(ctx, {
+          type: config.type,
+          data: { labels: config.labels, datasets: [{ label: 'Skor', data: config.data, backgroundColor: bgColor, borderColor: borderColor, borderWidth: 2, pointBackgroundColor: '#F59E0B', pointRadius: 4 }] },
+          options: { responsive: true, plugins: { legend: { display: false } }, scales: config.type === 'radar' ? { r: { ticks: { display: false } } } : { y: { beginAtZero: true } } }
+        });
+        guruChartsList.push(newChart);
+      });
+    }
+
+    // --- FITUR 4: RENDER INFO GURU (DIPERBAIKI) ---
+    async function renderInfoGuru() {
+      const containerTeori = document.getElementById("list-teori-guru");
+      if(containerTeori.innerHTML !== "" && !containerTeori.innerHTML.includes("Memuat")) return; 
+      
+      const icons = { "T01": "fa-briefcase", "T02": "fa-brain", "T03": "fa-eye", "T04": "fa-users", "T05": "fa-clock" };
+      
+      // Jika Master_Tes belum termuat, ambil dari server
+      if(!window.cacheMasterTes || window.cacheMasterTes.length === 0) {
+        containerTeori.innerHTML = "<p style='text-align:center; color:#666;'><i class='fa-solid fa-spinner fa-spin'></i> Memuat informasi instrumen dari server...</p>";
+        window.cacheMasterTes = await fetchData('Master_Tes');
+        containerTeori.innerHTML = ""; // Bersihkan teks loading
+      }
+      
+      if(window.cacheMasterTes && window.cacheMasterTes.length > 0) {
+        window.cacheMasterTes.forEach(t => {
+          let iconList = icons[t[0]] || "fa-file-lines";
+          containerTeori.insertAdjacentHTML('beforeend', `
+            <li style="display: flex; gap: 15px; align-items: flex-start; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e1;">
+              <div style="background: rgba(30, 58, 138, 0.1); color: var(--primary); width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem;">
+                <i class="fa-solid ${iconList}"></i>
+              </div>
+              <div style="flex-grow: 1; text-align: justify; line-height: 1.7;">
+                <b style="color: var(--primary); font-size: 1.05rem; display: block; margin-bottom: 5px;">${t[0]} - ${t[1]}</b>
+                <span style="font-size: 0.9rem; color: #475569;">${t[2]}</span>
+              </div>
+            </li>
+          `);
+        });
+      } else {
+        containerTeori.innerHTML = "<p style='text-align:center; color:#dc2626;'>Data instrumen belum tersedia di database.</p>";
+      }
+    }
+	
+	// Eksekusi API Hapus Data (Diperbarui untuk Pagination)
+    async function hapusDataSiswa(nisn, nama) {
+      proAlert.fire({ 
+        title: 'Hapus Data Tes?', 
+        text: `Tindakan ini akan menghapus permanen seluruh riwayat tes milik ${nama}.`, 
+        icon: 'warning', 
+        showCancelButton: true, 
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: '<i class="fa-solid fa-trash"></i> Ya, Hapus' 
+      }).then(async (res) => {
+        if(res.isConfirmed) {
+          proAlert.fire({ title: 'Menghapus Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+          try {
+            const resApi = await fetch(API_URL, {
+              method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: "delete_siswa", nisn: nisn })
+            });
+            const result = await resApi.json();
+            
+            if(result.status === "success") {
+              // Hapus dari memori lokal
+              cacheHasil = cacheHasil.filter(r => r[0] != nisn);
+              cacheMentah = cacheMentah.filter(r => r[1] != nisn);
+              
+              // PERBAIKAN: Panggil filterDataTabel() agar pagination ikut ter-refresh, bukan renderTabelSiswa()
+              filterDataTabel(); 
+              
+              proAlert.fire('Berhasil', 'Data siswa telah dihapus dari sistem.', 'success');
+            } else { 
+              proAlert.fire('Gagal', result.message || "Gagal merespons dari server.", 'error'); 
+            }
+          } catch(e) { 
+            console.error(e);
+            proAlert.fire('Error', 'Gagal koneksi ke server. Pastikan API URL sudah di-deploy ulang.', 'error'); 
+          }
+        }
+      });
+    }
 	
 	// Tambahkan ini di bagian bawah fungsi appLogin atau di dalam window.onload
 	// Agar nama sekolah langsung terisi saat aplikasi dibuka pertama kali
