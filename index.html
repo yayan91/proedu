@@ -94,12 +94,28 @@
     }
     
     @media print {
-      @page { size: A4 portrait; margin: 1cm; }
+      /* 1. Kunci Font agar selalu Times New Roman saat cetak */
+      body, #print-container, #print-container * { 
+        font-family: 'Times New Roman', Times, serif !important; 
+      }
+
+      @page { margin: 1cm; } 
       body * { visibility: hidden; }
       header, footer, main { display: none !important; }
       
       #print-container, #print-container * { visibility: visible; }
-      #print-container { display: block; position: absolute; top: 0; left: 0; width: 100%; color: black; background: white; }
+      #print-container { 
+        display: block; 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        color: black; 
+        background: white; 
+      }
+      
+      /* Tambahan: Paksa warna hitam untuk teks agar tidak abu-abu */
+      #print-container * { color: black !important; }
       
       .print-page { page-break-after: always; padding-bottom: 20px; }
       .kop-surat { text-align: center; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 15px; }
@@ -324,12 +340,15 @@
       <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
           <thead>
-            <tr style="background: var(--primary); color: white;">
-              <th style="padding: 12px; border: 1px solid #e2e8f0;">No</th>
-              <th style="padding: 12px; border: 1px solid #e2e8f0;">Nama Siswa</th>
-              <th style="padding: 12px; border: 1px solid #e2e8f0;">NISN</th>
-              <th style="padding: 12px; border: 1px solid #e2e8f0;">L/P</th>
-              <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: center;">Aksi Lanjutan</th>
+            <tr style="background: var(--primary); color: white; text-align: center; font-size: 0.85rem;">
+              <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: left;">No</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: left;">Nama Siswa</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Minat Karir</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Kecerdasan Majemuk</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Gaya Belajar</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Kepribadian</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Kebiasaan Belajar</th>
+              <th style="padding: 12px; border: 1px solid #e2e8f0;">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-siswa"></tbody>
@@ -344,14 +363,26 @@
 
     <div id="guru-cetak" class="sub-menu-guru card-panel" style="padding: 30px; text-align: center; display: none;">
       <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-print"></i> Cetak Massal Per Kelas</h3>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-        <select id="guru-select-kelas" class="input-control" style="width: 200px;"></select>
-        <select id="guru-select-tes" class="input-control" style="width: 200px;">
-          <option value="all">Rapor Lengkap</option>
-          <option value="T01">T01: RIASEC</option><option value="T02">T02: Kecerdasan Majemuk</option>
-          <option value="T03">T03: Gaya Belajar</option><option value="T04">T04: Kepribadian</option><option value="T05">T05: Kebiasaan</option>
+      
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; align-items: center; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
+        <select id="guru-select-kelas" class="input-control" style="width: 160px;"></select>
+        <select id="guru-select-tes" class="input-control" style="width: 220px;">
+          <option value="all">Semua Tes (Rekap Total)</option>
+          <option value="T01">T01: Minat Karir (RIASEC)</option>
+          <option value="T02">T02: Kecerdasan Majemuk</option>
+          <option value="T03">T03: Gaya Belajar</option>
+          <option value="T04">T04: Kepribadian</option>
+          <option value="T05">T05: Kebiasaan Belajar</option>
         </select>
-        <button class="btn btn-primary" onclick="triggerPrint('guru', 'massal')">Cetak Kelas</button>
+        
+        <div style="display: flex; gap: 10px; border-left: 2px solid #cbd5e1; padding-left: 15px;">
+          <button class="btn btn-primary" onclick="triggerPrint('guru', 'massal')" title="Cetak rapor individu berlembar-lembar">
+            <i class="fa-solid fa-file-lines"></i> Rapor Siswa
+          </button>
+          <button class="btn btn-success" onclick="triggerPrintTabelRekap()" title="Cetak tabel rekap kelas (1 lembar)">
+            <i class="fa-solid fa-table"></i> Tabel Rekap
+          </button>
+        </div>
       </div>
       <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #ccc;">
       <h3 style="margin-bottom: 15px; color: var(--primary);"><i class="fa-solid fa-user"></i> Cetak Per Siswa Spesifik</h3>
@@ -380,7 +411,7 @@
     // ---------------------------------------------------------
     // 1. MASUKKAN URL API BACKEND GOOGLE SCRIPT ANDA DI SINI
     // ---------------------------------------------------------
-    const API_URL = "https://script.google.com/macros/s/AKfycbyluvlr01gNF-NUh-pegVx7LhIrtMl2SNr_2Y8Vaf17wQvCJgASSqdlLPpQNwjWsORq/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyLslg15NtCX1TK344T35wWHINv0Cj3mtJkbsCzuWi9TkKEFbl41o7QFfGS52qoG_oC/exec"; 
 
     let sessionData = { role: null, nama: null, nisn_nip: null, kelas: null, jk: null, ta: null, sem: null, profilSekolah: null, listKelas: new Set() };
     let cacheBankSoal = [], cacheHasil = [], cacheMentah = [], cacheInterpretasi = [];
@@ -1232,9 +1263,26 @@
     }
 
     // --- FITUR 2: PAGINATION TABEL SISWA ---
+    // --- FITUR 2: PAGINATION TABEL SISWA (DIPERBAIKI) ---
     function filterDataTabel() {
       const kls = document.getElementById("tabel-select-kelas").value;
-      tabelFilteredData = cacheHasil.filter(r => r[3] == kls);
+      const rawData = cacheHasil.filter(r => r[3] == kls);
+      
+      // LOGIKA MERGE: Gabungkan baris data dengan NISN yang sama
+      let mergedMap = {};
+      rawData.forEach(row => {
+        let nisn = row[0];
+        if(!mergedMap[nisn]) {
+          mergedMap[nisn] = [...row]; // Copy data pertama
+        } else {
+          // Timpa kolom hasil tes (kolom 7 sampai 40) jika ada isinya
+          for(let i=7; i<=40; i++) { 
+            if(row[i] !== "") mergedMap[nisn][i] = row[i]; 
+          }
+        }
+      });
+      
+      tabelFilteredData = Object.values(mergedMap);
       tabelCurrentPage = 1;
       renderTabelSiswa();
     }
@@ -1254,15 +1302,26 @@
       const paginatedData = tabelFilteredData.slice(start, end);
 
       paginatedData.forEach((row, index) => {
+        // Trik visual: Buat badge hijau jika sudah isi, abu-abu strip jika kosong
+        const t01 = row[13] ? `<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">${row[13]}</span>` : `<span style="color:#ccc;">-</span>`;
+        const t02 = row[23] ? `<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">${row[23]}</span>` : `<span style="color:#ccc;">-</span>`;
+        const t03 = row[27] ? `<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">${row[27]}</span>` : `<span style="color:#ccc;">-</span>`;
+        const t04 = row[33] ? `<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">${row[33]}</span>` : `<span style="color:#ccc;">-</span>`;
+        const t05 = row[40] ? `<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">${row[40]}</span>` : `<span style="color:#ccc;">-</span>`;
+
         tbody.insertAdjacentHTML('beforeend', `
           <tr style="border-bottom: 1px solid #e2e8f0; transition: 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
             <td style="padding: 12px;">${start + index + 1}</td>
-            <td style="padding: 12px; font-weight: 600; color: var(--primary);">${row[1]}</td>
-            <td style="padding: 12px;">${row[0]}</td>
-            <td style="padding: 12px;">${row[2]}</td>
-            <td style="padding: 12px; text-align: center; display: flex; gap: 5px; justify-content: center;">
-              <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;" onclick="lihatCetakTabel('${row[0]}')"><i class="fa-solid fa-print"></i> Cetak</button>
-              <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="hapusDataSiswa('${row[0]}', '${row[1]}')"><i class="fa-solid fa-trash"></i> Hapus</button>
+            <td style="padding: 12px; font-weight: 600; color: var(--primary);">
+              ${row[1]} <br><span style="font-size:0.75rem; color:#666; font-weight:normal;">NISN: ${row[0]}</span>
+            </td>
+            <td style="padding: 12px; text-align:center;">${t01}</td>
+            <td style="padding: 12px; text-align:center;">${t02}</td>
+            <td style="padding: 12px; text-align:center;">${t03}</td>
+            <td style="padding: 12px; text-align:center;">${t04}</td>
+            <td style="padding: 12px; text-align:center;">${t05}</td>
+            <td style="padding: 12px; text-align: center; height:100%;">
+              <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;" onclick="hapusDataSiswa('${row[0]}', '${row[1]}')" title="Manajemen Hapus Data"><i class="fa-solid fa-trash"></i> Hapus</button>
             </td>
           </tr>
         `);
@@ -1273,9 +1332,61 @@
       document.getElementById("btn-next-page").disabled = tabelCurrentPage >= totalPages;
     }
 
-    function lihatCetakTabel(nisn) {
-      document.getElementById('guru-input-nisn').value = nisn;
-      showSubMenuGuru('guru-cetak', document.querySelectorAll('#page-guru .nav-buttons .btn')[2]);
+    // Eksekusi API Hapus Data (Versi Pilihan Spesifik)
+    async function hapusDataSiswa(nisn, nama) {
+      // Cek tes apa saja yang sudah dikerjakan siswa ini dari data yang sudah di-merge
+      const dataSiswa = tabelFilteredData.find(r => r[0] == nisn);
+      if(!dataSiswa) return;
+
+      let optionsHTML = '<option value="ALL" style="color:red; font-weight:bold;">🚨 HAPUS SEMUA RIWAYAT TES</option>';
+      if (dataSiswa[13] !== "") optionsHTML += '<option value="T01">Hanya T01: Minat Karir</option>';
+      if (dataSiswa[23] !== "") optionsHTML += '<option value="T02">Hanya T02: Kecerdasan Majemuk</option>';
+      if (dataSiswa[27] !== "") optionsHTML += '<option value="T03">Hanya T03: Gaya Belajar</option>';
+      if (dataSiswa[33] !== "") optionsHTML += '<option value="T04">Hanya T04: Kepribadian</option>';
+      if (dataSiswa[40] !== "") optionsHTML += '<option value="T05">Hanya T05: Kebiasaan Belajar</option>';
+
+      const { value: testToDel } = await proAlert.fire({ 
+        title: 'Manajemen Data Siswa', 
+        html: `<p style="font-size:0.9rem; margin-bottom:15px; text-align:left;">Pilih data tes milik <b>${nama}</b> yang ingin dihapus dari server:</p>
+               <select id="swal-select-hapus" class="input-control" style="font-weight:bold;">${optionsHTML}</select>`, 
+        icon: 'warning', 
+        showCancelButton: true, 
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Eksekusi Hapus',
+        preConfirm: () => { return document.getElementById('swal-select-hapus').value; }
+      });
+
+      if(testToDel) {
+        proAlert.fire({ title: 'Menghapus Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        try {
+          const resApi = await fetch(API_URL, {
+            method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "delete_siswa", nisn: nisn, id_tes: testToDel })
+          });
+          const result = await resApi.json();
+          
+          if(result.status === "success") {
+            // Hapus dari memori lokal dengan cerdas
+            if (testToDel === "ALL") {
+              cacheHasil = cacheHasil.filter(r => r[0] != nisn);
+              cacheMentah = cacheMentah.filter(r => r[1] != nisn);
+            } else {
+              cacheMentah = cacheMentah.filter(r => !(r[1] == nisn && r[7] == testToDel));
+              let domIdx = {"T01":13, "T02":23, "T03":27, "T04":33, "T05":40}[testToDel];
+              cacheHasil = cacheHasil.filter(r => !(r[0] == nisn && r[domIdx] !== ""));
+            }
+            
+            filterDataTabel(); // Render ulang tabel dan pagination
+            if(document.getElementById('guru-dash').style.display === 'block') updateDashDropdownSiswa(); // Refresh chart jika terbuka
+            
+            proAlert.fire('Berhasil', 'Data berhasil dibersihkan dari database.', 'success');
+          } else { 
+            proAlert.fire('Gagal', result.message, 'error'); 
+          }
+        } catch(e) { 
+          proAlert.fire('Error', 'Gagal koneksi ke server API.', 'error'); 
+        }
+      }
     }
 
     // --- FITUR 3: DASHBOARD PRO (CHART KELAS & INDIVIDU) ---
@@ -1284,8 +1395,15 @@
       const selectSiswa = document.getElementById("dash-select-siswa");
       selectSiswa.innerHTML = `<option value="ALL">🌟 Tampilkan Rata-Rata Kelas</option>`;
       
-      cacheHasil.filter(r => r[3] == kls).forEach(row => {
-        selectSiswa.insertAdjacentHTML('beforeend', `<option value="${row[0]}">${row[0]} - ${row[1]}</option>`);
+      const rawData = cacheHasil.filter(r => r[3] == kls);
+      let unikSiswa = new Set(); // Mencegah nama ganda
+      
+      rawData.forEach(row => {
+        let nisn = row[0];
+        if(!unikSiswa.has(nisn)) {
+          unikSiswa.add(nisn);
+          selectSiswa.insertAdjacentHTML('beforeend', `<option value="${nisn}">${nisn} - ${row[1]}</option>`);
+        }
       });
       renderDashChartGuru();
     }
@@ -1322,8 +1440,16 @@
         }
         isAveraging = true;
       } else {
-        sourceData = cacheHasil.find(r => r[0] == nisn);
-        if(!sourceData) return;
+        // LOGIKA MERGE INDIVIDU: Gabungkan semua tes siswa ini ke dalam 1 array
+        const dataSiswa = cacheHasil.filter(r => r[0] == nisn);
+        if(dataSiswa.length === 0) return;
+        
+        sourceData = [...dataSiswa[0]];
+        dataSiswa.forEach(row => {
+          for(let i=7; i<=40; i++) { 
+            if(row[i] !== "") sourceData[i] = row[i]; 
+          }
+        });
       }
 
       // Konfigurasi Chart Dinamis
@@ -1340,7 +1466,6 @@
         const wrapper = document.createElement("div");
         wrapper.style.width = "100%"; wrapper.style.maxWidth = "350px"; wrapper.style.background = "#ffffff"; wrapper.style.padding = "20px"; wrapper.style.borderRadius = "15px"; wrapper.style.border = "1px solid #e2e8f0"; wrapper.style.boxShadow = "0 8px 20px rgba(0,0,0,0.06)";
         
-        // Judul Box Dinamis (Menyesuaikan Individu atau Kelas)
         let subTitle = isAveraging ? `<span style="font-size:0.8rem; color:#ef4444; background:#fee2e2; padding:2px 8px; border-radius:10px;">📊 Rata-rata Kelas</span>` : `<span style="font-size:0.8rem; color:#10b981; background:#d1fae5; padding:2px 8px; border-radius:10px;">👤 Profil Individu</span>`;
         
         wrapper.innerHTML = `<div style="text-align:center; font-weight:bold; color:var(--primary); margin-bottom:10px;">${config.title}<br>${subTitle}</div><canvas id="${config.id}"></canvas>`;
@@ -1393,43 +1518,211 @@
       }
     }
 	
-	// Eksekusi API Hapus Data (Diperbarui untuk Pagination)
-    async function hapusDataSiswa(nisn, nama) {
-      proAlert.fire({ 
-        title: 'Hapus Data Tes?', 
-        text: `Tindakan ini akan menghapus permanen seluruh riwayat tes milik ${nama}.`, 
-        icon: 'warning', 
-        showCancelButton: true, 
-        confirmButtonColor: '#dc2626',
-        confirmButtonText: '<i class="fa-solid fa-trash"></i> Ya, Hapus' 
-      }).then(async (res) => {
-        if(res.isConfirmed) {
-          proAlert.fire({ title: 'Menghapus Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-          try {
-            const resApi = await fetch(API_URL, {
-              method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: "delete_siswa", nisn: nisn })
-            });
-            const result = await resApi.json();
-            
-            if(result.status === "success") {
-              // Hapus dari memori lokal
-              cacheHasil = cacheHasil.filter(r => r[0] != nisn);
-              cacheMentah = cacheMentah.filter(r => r[1] != nisn);
-              
-              // PERBAIKAN: Panggil filterDataTabel() agar pagination ikut ter-refresh, bukan renderTabelSiswa()
-              filterDataTabel(); 
-              
-              proAlert.fire('Berhasil', 'Data siswa telah dihapus dari sistem.', 'success');
-            } else { 
-              proAlert.fire('Gagal', result.message || "Gagal merespons dari server.", 'error'); 
+	// ==========================================
+    // MESIN CETAK TABEL REKAPITULASI KELAS (SUPER FIX)
+    // ==========================================
+    
+    function setPrintOrientation(mode) {
+      let style = document.getElementById('print-orientation-style');
+      if(!style) {
+        style = document.createElement('style');
+        style.id = 'print-orientation-style';
+        document.head.appendChild(style);
+      }
+      style.innerHTML = `@media print { @page { size: A4 ${mode}; margin: 1cm; } }`;
+    }
+
+    async function triggerPrintTabelRekap() {
+      const kls = document.getElementById("guru-select-kelas").value;
+      const tesType = document.getElementById("guru-select-tes").value;
+      if(!kls) return proAlert.fire('Perhatian', 'Pilih kelas terlebih dahulu.', 'warning');
+
+      proAlert.fire({ title: 'Menyusun Tabel...', text: 'Sinkronisasi data siswa...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        // Pastikan cacheHasil tidak kosong
+        if(cacheHasil.length === 0) cacheHasil = await fetchData('Rekap_Hasil_Akhir');
+        const masterSiswa = await fetchData('Master_Siswa');
+        if(!window.cacheMasterTes) window.cacheMasterTes = await fetchData('Master_Tes');
+        
+        let siswaDiKelas = masterSiswa.filter(s => s[5] == kls);
+        if(siswaDiKelas.length === 0) return proAlert.fire('Kosong', 'Tidak ada siswa di kelas ini.', 'info');
+        
+        siswaDiKelas.sort((a, b) => String(a[2]).localeCompare(String(b[2])));
+
+        // 1. ORIENTASI KERTAS: Hanya T02 yang Landscape
+        setPrintOrientation(tesType === 'T02' ? 'landscape' : 'portrait');
+
+        // 2. LOGIKA MERGE & ANTI-ERROR NISN
+        let mergedMap = {};
+        cacheHasil.forEach(row => {
+          let keyNISN = String(row[0]).trim();
+          if(!mergedMap[keyNISN]) {
+            mergedMap[keyNISN] = [...row];
+          } else {
+            for(let i=7; i<=40; i++) { 
+              if(row[i] !== "" && row[i] !== undefined && row[i] !== null) {
+                mergedMap[keyNISN][i] = row[i]; 
+              }
             }
-          } catch(e) { 
-            console.error(e);
-            proAlert.fire('Error', 'Gagal koneksi ke server. Pastikan API URL sudah di-deploy ulang.', 'error'); 
+          }
+        });
+        let arrayMergedHasil = Object.values(mergedMap);
+
+        // Fungsi Helper untuk mencegah nilai 0 dianggap kosong
+        const c = (val) => (val !== undefined && val !== "") ? val : '-';
+
+        // 3. HEADER KOLOM SESUAI PILIHAN
+        let thHtml = '';
+        if (tesType === 'all') {
+          thHtml = `<th style="padding:8px; border:1px solid black;">Minat Karir</th><th style="padding:8px; border:1px solid black;">Kecerdasan Majemuk</th><th style="padding:8px; border:1px solid black;">Gaya Belajar</th><th style="padding:8px; border:1px solid black;">Kepribadian</th><th style="padding:8px; border:1px solid black;">Kebiasaan Belajar</th>`;
+        } else if (tesType === 'T01') {
+          thHtml = `<th style="padding:8px; border:1px solid black;">R</th><th style="padding:8px; border:1px solid black;">I</th><th style="padding:8px; border:1px solid black;">A</th><th style="padding:8px; border:1px solid black;">S</th><th style="padding:8px; border:1px solid black;">E</th><th style="padding:8px; border:1px solid black;">C</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
+        } else if (tesType === 'T02') {
+          thHtml = `<th style="padding:8px; border:1px solid black;">Ling</th><th style="padding:8px; border:1px solid black;">Log</th><th style="padding:8px; border:1px solid black;">Spas</th><th style="padding:8px; border:1px solid black;">Kin</th><th style="padding:8px; border:1px solid black;">Mus</th><th style="padding:8px; border:1px solid black;">Inter</th><th style="padding:8px; border:1px solid black;">Intra</th><th style="padding:8px; border:1px solid black;">Nat</th><th style="padding:8px; border:1px solid black;">Eks</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
+        } else if (tesType === 'T03') {
+          thHtml = `<th style="padding:8px; border:1px solid black;">Visual</th><th style="padding:8px; border:1px solid black;">Auditori</th><th style="padding:8px; border:1px solid black;">Kinestetik</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
+        } else if (tesType === 'T04') {
+          thHtml = `<th style="padding:8px; border:1px solid black;">Open</th><th style="padding:8px; border:1px solid black;">Cons</th><th style="padding:8px; border:1px solid black;">Extra</th><th style="padding:8px; border:1px solid black;">Agree</th><th style="padding:8px; border:1px solid black;">Neuro</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
+        } else if (tesType === 'T05') {
+          thHtml = `<th style="padding:8px; border:1px solid black;">Waktu</th><th style="padding:8px; border:1px solid black;">Motivasi</th><th style="padding:8px; border:1px solid black;">Fokus</th><th style="padding:8px; border:1px solid black;">Digital</th><th style="padding:8px; border:1px solid black;">Cemas</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Kategori</th>`;
+        }
+
+        // Loop Data Siswa
+        let trHtml = '';
+        siswaDiKelas.forEach((s, idx) => {
+          let nisnTarget = String(s[3]).trim(); 
+          let namaTarget = String(s[2]).trim().toLowerCase(); // Cadangan pencocokan
+          let jk = (s[4] === 'Laki-laki' || s[4] === 'L' || s[4] === 'l') ? 'L' : 'P';
+          
+          // SUPER MATCHING: Cari berdasarkan NISN, jika gagal otomatis cari pakai Nama Lengkap
+          let hasil = arrayMergedHasil.find(r => 
+            String(r[0]).trim() === nisnTarget || 
+            String(r[1]).trim().toLowerCase() === namaTarget
+          ) || [];
+          
+          let tdData = '';
+          if (tesType === 'all') {
+            tdData = `
+              <td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[13])}</td>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[23])}</td>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[27])}</td>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[33])}</td>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[40])}</td>`;
+          } else if (tesType === 'T01') {
+            tdData = `<td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[7])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[8])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[9])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[10])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[11])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[12])}</td><td style="padding:6px; border:1px solid black; text-align:center; font-weight:bold; background:#f8fafc;">${c(hasil[13])}</td>`;
+          } else if (tesType === 'T02') {
+            tdData = `<td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[14])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[15])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[16])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[17])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[18])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[19])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[20])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[21])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[22])}</td><td style="padding:6px; border:1px solid black; text-align:center; font-weight:bold; background:#f8fafc;">${c(hasil[23])}</td>`;
+          } else if (tesType === 'T03') {
+            tdData = `<td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[24])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[25])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[26])}</td><td style="padding:6px; border:1px solid black; text-align:center; font-weight:bold; background:#f8fafc;">${c(hasil[27])}</td>`;
+          } else if (tesType === 'T04') {
+            tdData = `<td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[28])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[29])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[30])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[31])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[32])}</td><td style="padding:6px; border:1px solid black; text-align:center; font-weight:bold; background:#f8fafc;">${c(hasil[33])}</td>`;
+          } else if (tesType === 'T05') {
+            tdData = `<td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[34])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[35])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[36])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[37])}</td><td style="padding:6px; border:1px solid black; text-align:center;">${c(hasil[38])}</td><td style="padding:6px; border:1px solid black; text-align:center; font-weight:bold; background:#f8fafc;">${c(hasil[40])}</td>`;
+          }
+
+          trHtml += `
+            <tr>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${idx+1}</td>
+              <td style="padding:6px; border:1px solid black;">${s[2]}</td>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${nisnTarget}</td>
+              <td style="padding:6px; border:1px solid black; text-align:center;">${jk}</td>
+              ${tdData}
+            </tr>`;
+        });
+
+        // Info Instrumen
+        let infoInstrumen = '';
+        if(tesType !== 'all') {
+          let dataTes = window.cacheMasterTes.find(t => t[0] === tesType);
+          if(dataTes) {
+            infoInstrumen = `
+              <div style="margin-top: 20px; font-size: 11px; text-align: justify; border: 1px dashed black; padding: 10px; background: #fafafa;">
+                <b>Keterangan Instrumen (${dataTes[1]}):</b> ${dataTes[2]}
+              </div>`;
           }
         }
-      });
+
+        // Kop Surat
+        const sek = sessionData.profilSekolah;
+        const logoKiri = sek[9] && sek[9].length > 5 ? sek[9] : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Garuda_Pancasila_Coat_of_Arms_of_Indonesia.svg/800px-Garuda_Pancasila_Coat_of_Arms_of_Indonesia.svg.png';
+        const logoKanan = sek[10] && sek[10].length > 5 ? sek[10] : 'https://cdn-icons-png.flaticon.com/512/3281/3281323.png';
+
+        // 4. JUDUL SESUAI NAMA TES
+        const namaTesMap = {
+          "T01": "MINAT KARIR (RIASEC)",
+          "T02": "KECERDASAN MAJEMUK",
+          "T03": "GAYA BELAJAR",
+          "T04": "KEPRIBADIAN",
+          "T05": "KEBIASAAN BELAJAR"
+        };
+        let judulLaporan = tesType === 'all' ? "REKAPITULASI HASIL ASESMEN KESELURUHAN" : `REKAPITULASI HASIL ASESMEN ${namaTesMap[tesType]}`;
+
+        // 5. TANGGAL REAL-TIME
+        const tglSekarang = new Date();
+        const bulanIndo = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const formatTanggalCetak = `${tglSekarang.getDate()} ${bulanIndo[tglSekarang.getMonth()]} ${tglSekarang.getFullYear()}`;
+
+        const printContainer = document.getElementById("print-container");
+
+        printContainer.innerHTML = `
+          <div class="print-page" style="font-family: 'Times New Roman', Times, serif; color: black; line-height: 1.4; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px double black; padding-bottom: 10px; margin-bottom: 15px; text-align: center;">
+              <img src="${logoKiri}" style="width: 70px; height: 70px; object-fit: contain;">
+              <div style="flex-grow: 1; line-height: 1.2;">
+                <div style="font-size: 14px;">${sek[0].toUpperCase()}</div>
+                <div style="font-size: 14px;">${sek[1].toUpperCase()}</div>
+                <div style="font-size: 18px; font-weight: bold; margin: 4px 0;">${sek[2].toUpperCase()}</div>
+                <div style="font-size: 13px; font-weight: bold;">${sek[3].toUpperCase()}</div>
+                <!-- Tambahan Alamat Sekolah -->
+                <div style="font-size: 11px; font-style: italic; margin-top: 2px;">${sek[4]}</div>
+              </div>
+              <img src="${logoKanan}" style="width: 70px; height: 70px; object-fit: contain;">
+            </div>
+
+            <h3 style="text-align:center; font-size:14px; text-transform:uppercase; margin-bottom:15px;">${judulLaporan}</h3>
+            
+            <div style="margin-bottom: 25px; font-weight:bold; text-align: center; text-transform: uppercase;">
+              TAHUN AJARAN: ${sek[5]} (${sek[6]}) &nbsp;&nbsp;|&nbsp;&nbsp; KELAS: ${kls}
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
+              <thead>
+                <tr style="background: #e0e0e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align:center;">
+                  <th style="padding:8px; border:1px solid black; width: 3%;">No</th>
+                  <th style="padding:8px; border:1px solid black; width: 22%;">Nama Lengkap</th>
+                  <th style="padding:8px; border:1px solid black; width: 10%;">NISN</th>
+                  <th style="padding:8px; border:1px solid black; width: 5%;">L/P</th>
+                  ${thHtml}
+                </tr>
+              </thead>
+              <tbody>${trHtml}</tbody>
+            </table>
+            
+            ${infoInstrumen}
+
+            <div style="width: 100%; margin-top: 30px; display: flex; justify-content: flex-end; page-break-inside: avoid; text-align: center;">
+              <div style="width: 250px; font-size: 12px;">
+                <p>Makassar, ${formatTanggalCetak}</p>
+                <p>Guru Bimbingan dan Konseling,</p>
+                <p style="margin-top: 60px; font-weight: bold; text-decoration: underline;">${sessionData.nama}</p>
+                <p>NIP. ${sessionData.nisn_nip}</p>
+              </div>
+            </div>
+          </div>
+        `;
+
+        proAlert.close();
+        setTimeout(() => { 
+          window.print(); 
+          // Reset kembali ke portrait agar cetakan lain tidak ikut landscape
+          setPrintOrientation('portrait'); 
+        }, 800);
+
+      } catch (error) {
+        console.error(error);
+        proAlert.fire('Error', 'Gagal memproses pembuatan tabel PDF.', 'error');
+      }
     }
 	
 	// Tambahkan ini di bagian bawah fungsi appLogin atau di dalam window.onload
