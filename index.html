@@ -94,7 +94,7 @@
     }
     
     @media print {
-      /* 1. Kunci Font agar selalu Times New Roman saat cetak */
+      /* Kunci Font agar selalu Times New Roman saat cetak */
       body, #print-container, #print-container * { 
         font-family: 'Times New Roman', Times, serif !important; 
       }
@@ -110,12 +110,11 @@
         top: 0; 
         left: 0; 
         width: 100%; 
-        color: black; 
+        /* Warna latar putih tetap dipertahankan */
         background: white; 
       }
       
-      /* Tambahan: Paksa warna hitam untuk teks agar tidak abu-abu */
-      #print-container * { color: black !important; }
+      /* Baris paksaan warna hitam sudah dihapus agar warna badge tetap muncul */
       
       .print-page { page-break-after: always; padding-bottom: 20px; }
       .kop-surat { text-align: center; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 15px; }
