@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PersonaEdu</title>
+  <title>PersonaEdu-Pro</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1093,7 +1093,7 @@
       if (mergedData[23] !== "") chartsConfig.push({ id: 'chartT02', title: 'T02: Kecerdasan Majemuk', type: 'radar', labels: ['Linguistik', 'Logika', 'Spasial', 'Kinestetik', 'Musikal', 'Interpersonal', 'Intrapersonal', 'Naturalis', 'Eksistensial'], data: [mergedData[14], mergedData[15], mergedData[16], mergedData[17], mergedData[18], mergedData[19], mergedData[20], mergedData[21], mergedData[22]] });
       if (mergedData[27] !== "") chartsConfig.push({ id: 'chartT03', title: 'T03: Gaya Belajar', type: 'bar', labels: ['Visual', 'Auditori', 'Kinestetik'], data: [mergedData[24], mergedData[25], mergedData[26]] });
       if (mergedData[33] !== "") chartsConfig.push({ id: 'chartT04', title: 'T04: Kepribadian (Big 5)', type: 'radar', labels: ['Openness', 'Conscientious', 'Extraversion', 'Agreeable', 'Neuroticism'], data: [mergedData[28], mergedData[29], mergedData[30], mergedData[31], mergedData[32]] });
-      if (mergedData[40] !== "") chartsConfig.push({ id: 'chartT05', title: 'T05: Sikap & Kebiasaan', type: 'radar', labels: ['Manajemen Waktu', 'Motivasi', 'Konsentrasi', 'Regulasi Digital', 'Kecemasan'], data: [mergedData[34], mergedData[35], mergedData[36], mergedData[37], mergedData[38]] });
+      if (mergedData[40] !== "") chartsConfig.push({ id: 'chartT05', title: 'T05: Sikap & Kebiasaan', type: 'radar', labels: ['Manajemen Waktu', 'Motivasi', 'Konsentrasi', 'Regulasi', 'Kecemasan'], data: [mergedData[34], mergedData[35], mergedData[36], mergedData[37], mergedData[38]] });
 
       chartsConfig.forEach(config => {
         let dataNum = config.data.map(Number);
@@ -1269,7 +1269,7 @@
             kontenTesHTML += buildTesBox('T04', '4. ' + getNamaTes('T04'), ['Openness','Conscientious','Extraversion','Agreeable','Neuroticism'], [row[28],row[29],row[30],row[31],row[32]], row[33]);
           }
           if((printType === 'all' || printType === 'T05') && row[40]) {
-            kontenTesHTML += buildTesBox('T05', '5. ' + getNamaTes('T05'), ['Waktu','Motivasi','Fokus','Digital','Cemas'], [row[34],row[35],row[36],row[37],row[38]], row[40]);
+            kontenTesHTML += buildTesBox('T05', '5. ' + getNamaTes('T05'), ['Manajemen Waktu','Motivasi','Fokus','Regulasi','Kecemasan'], [row[34],row[35],row[36],row[37],row[38]], row[40]);
           }
 
           if(kontenTesHTML === "") kontenTesHTML = "<p style='text-align:center; padding:20px; font-style:italic;'>Belum ada data tes terselesaikan.</p>";
@@ -1685,10 +1685,10 @@
       // Konfigurasi Chart Dinamis
       const chartsConfig = [];
       if (sourceData[7] !== "") chartsConfig.push({ id: 'gChartT01', title: 'T01: RIASEC', type: 'radar', labels: ['Realistic', 'Investigative', 'Artistic', 'Social', 'Enterprising', 'Conventional'], data: [sourceData[7], sourceData[8], sourceData[9], sourceData[10], sourceData[11], sourceData[12]] });
-      if (sourceData[14] !== "") chartsConfig.push({ id: 'gChartT02', title: 'T02: Kecerdasan Majemuk', type: 'radar', labels: ['Ling', 'Log', 'Spas', 'Kin', 'Mus', 'Inter', 'Intra', 'Nat', 'Eks'], data: [sourceData[14], sourceData[15], sourceData[16], sourceData[17], sourceData[18], sourceData[19], sourceData[20], sourceData[21], sourceData[22]] });
+      if (sourceData[14] !== "") chartsConfig.push({ id: 'gChartT02', title: 'T02: Kecerdasan Majemuk', type: 'radar', labels: ['Linguistik', 'Logika', 'Spasial', 'Kinestetik', 'Musikal', 'Interpersonal', 'Intrapersonal', 'Naturalis', 'Eksistensial'], data: [sourceData[14], sourceData[15], sourceData[16], sourceData[17], sourceData[18], sourceData[19], sourceData[20], sourceData[21], sourceData[22]] });
       if (sourceData[24] !== "") chartsConfig.push({ id: 'gChartT03', title: 'T03: Gaya Belajar', type: 'bar', labels: ['Visual', 'Auditori', 'Kinestetik'], data: [sourceData[24], sourceData[25], sourceData[26]] });
-      if (sourceData[28] !== "") chartsConfig.push({ id: 'gChartT04', title: 'T04: Kepribadian', type: 'radar', labels: ['Open', 'Conscientious', 'Extra', 'Agree', 'Neuro'], data: [sourceData[28], sourceData[29], sourceData[30], sourceData[31], sourceData[32]] });
-      if (sourceData[34] !== "") chartsConfig.push({ id: 'gChartT05', title: 'T05: Kebiasaan', type: 'bar', labels: ['Waktu', 'Motivasi', 'Fokus', 'Digital', 'Cemas'], data: [sourceData[34], sourceData[35], sourceData[36], sourceData[37], sourceData[38]] });
+      if (sourceData[28] !== "") chartsConfig.push({ id: 'gChartT04', title: 'T04: Kepribadian', type: 'radar', labels: ['Openness', 'Conscientious', 'Extraversion', 'Agreeable', 'Neuroticism'], data: [sourceData[28], sourceData[29], sourceData[30], sourceData[31], sourceData[32]] });
+      if (sourceData[34] !== "") chartsConfig.push({ id: 'gChartT05', title: 'T05: Kebiasaan', type: 'bar', labels: ['Manajemen Waktu', 'Motivasi', 'Konsentrasi', 'Regulasi', 'Kecemasan'], data: [sourceData[34], sourceData[35], sourceData[36], sourceData[37], sourceData[38]] });
 
       if (chartsConfig.length === 0) { container.innerHTML = "<p>Siswa ini belum menyelesaikan tes apapun.</p>"; return; }
 
@@ -1905,9 +1905,9 @@
         } else if (tesType === 'T03') {
           thHtml = `<th style="padding:8px; border:1px solid black;">Visual</th><th style="padding:8px; border:1px solid black;">Auditori</th><th style="padding:8px; border:1px solid black;">Kinestetik</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
         } else if (tesType === 'T04') {
-          thHtml = `<th style="padding:8px; border:1px solid black;">Open</th><th style="padding:8px; border:1px solid black;">Cons</th><th style="padding:8px; border:1px solid black;">Extra</th><th style="padding:8px; border:1px solid black;">Agree</th><th style="padding:8px; border:1px solid black;">Neuro</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
+          thHtml = `<th style="padding:8px; border:1px solid black;">Openness</th><th style="padding:8px; border:1px solid black;">Conscientious</th><th style="padding:8px; border:1px solid black;">Extraversion</th><th style="padding:8px; border:1px solid black;">Agreeable</th><th style="padding:8px; border:1px solid black;">Neuroticism</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Dominan</th>`;
         } else if (tesType === 'T05') {
-          thHtml = `<th style="padding:8px; border:1px solid black;">Waktu</th><th style="padding:8px; border:1px solid black;">Motivasi</th><th style="padding:8px; border:1px solid black;">Fokus</th><th style="padding:8px; border:1px solid black;">Digital</th><th style="padding:8px; border:1px solid black;">Cemas</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Kategori</th>`;
+          thHtml = `<th style="padding:8px; border:1px solid black;">Manajemen Waktu</th><th style="padding:8px; border:1px solid black;">Motivasi</th><th style="padding:8px; border:1px solid black;">Konsentrasi</th><th style="padding:8px; border:1px solid black;">Regulasi</th><th style="padding:8px; border:1px solid black;">Kecemasan</th><th style="padding:8px; border:1px solid black; background:#f0f0f0;">Kategori</th>`;
         }
 
         // Loop Data Siswa
